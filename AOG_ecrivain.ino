@@ -2,11 +2,14 @@
     V2.50 - 07/04/2023 - Daniel Desmartins
    Connected to the Relay Port in AgOpenGPS
 
-Ecriture d'un message  sur 7 section pour feter  noel  
+  Ecriture d'un message  sur 7 section pour feter  noel
    bric bric  20/12/2023
-  
+>>files  to generate dot  matrix 
+https://docs.google.com/spreadsheets/d/1SNG4S7sTqmZtR76YS03U3PU_Yl2-DZqmN_SXQ4Z_i8E/edit?usp=sharing
+
 */
 
+byte message[] = {  0,  0,  127,  2,  4,  2,  127,  0,  127,  73, 73, 65, 0,  126,  25, 41, 78, 0,  126,  25, 41, 78, 0,  3,  4,  120,  4,  3,  0,  0,  0,  0,  62, 65, 65, 34, 0,  127,  8,  8,  127,  0,  126,  25, 41, 78, 0,  0,  65, 127,  65, 0,  46, 73, 73, 58, 0,  1,  1,  127,  1,  1,  0,  127,  2,  4,  2,  127,  0,  0,  126,  9,  9,  126,  0,  46, 73, 73, 58, 0,  0,  0,  0,  0,  0,  20, 30, 127,  30, 20, 0};
 
 
 uint8_t  mainByte = 1;  // on donne la valeur  au section automatique = 1  ou   manuel  = 0  ou rien  2  pas d'interet
@@ -38,18 +41,16 @@ uint8_t AOG[] = { 0x80, 0x81, 0x7B, 0xEA, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0xCC };
 uint8_t relayLo = 0, relayHi = 0;
 
 uint8_t onLo = 0, offLo = 0, onHi = 0, offHi = 0 ;
-//End of variables
-byte message_1[] = {127,127,0,  0,  125,  123,  125,  0,  127,  0,  54, 54, 62, 127,  1,  102,  86, 49, 127,  1,  102,  86, 49, 127,  124,  123,  7,  123,  124,  127,  127,  127,  127,  65, 62, 62, 93, 127,  0,  119,  119,  0,  127,  1,  102,  86, 49, 127,  127,  62, 0,  62, 127,  81, 54, 54, 69, 127,  126,  126,  0,  126,  126,  127,  0,  125,  123,  125,  0,  127,  127,  1,  118,  118,  1,  127,  81, 54, 54, 69, 127,  127,  127,  127,  127,  127,  107,  97, 0,  97, 107,  127,  127,  127,  127,  127,  127,  127,  127,  127,  127,  127,  127,  127,  127};
 
 
-int boucle = 1050 ; //
-int bouclen = 0 ; //  incrementeur 
-int indice =  0;
+uint16_t tableau = 0;
+uint16_t boucle = 0;
+uint8_t boom = 0 ;
 
 const int buttonPin = A0;         // the number of the pushbutton pin
 const int ledPin = LED_BUILTIN;  // the number of the LED pin
- 
 
+//End of variables
 void setup() {
 
 
@@ -64,13 +65,15 @@ void setup() {
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT_PULLUP);
 
+tableau= sizeof(message)*10;
+
 } //end of setup
 
 void loop() {
 
 
 
-      
+
 
 
   currentTime = millis();
@@ -88,29 +91,28 @@ void loop() {
     }
 
 
-     mainByte = 1;
- bool buttonState = digitalRead(buttonPin);
+    mainByte = 1;
+    bool buttonState = digitalRead(buttonPin);
 
-  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH) {
-    // turn LED on:
-    digitalWrite(ledPin, HIGH);
-      if( bouclen++ > boucle)  bouclen= 1 ;
-       indice =  bouclen /10;
-    
-  } else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW);
-    indice = 0;
-  }
-     
+    // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+    if (buttonState == LOW) {
+      // turn LED on:
+      digitalWrite(ledPin, HIGH);
+      if (boucle++ > tableau) boucle = 0;
+      boom = message[boucle / 10];
+
+    } else {
+      // turn LED off:
+      digitalWrite(ledPin, LOW);
+      boom = 0;
+    }
+
 
     //Send to AOG
     AOG[5] = (uint8_t)mainByte;
-    AOG[9] = (uint8_t)~message_1[indice];//onLo;
-    AOG[10] = (uint8_t)message_1[indice];//offLo;
-    AOG[11] = (uint8_t)AOG[9];//onHi;
-    AOG[12] = (uint8_t)AOG[10];//offHi;
+    AOG[9] = (uint8_t)boom; //onLo;
+    AOG[10] = (uint8_t)~boom; //offLo;
+
 
     //add the checksum
     int16_t CK_A = 0;
