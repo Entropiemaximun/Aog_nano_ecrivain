@@ -117,6 +117,7 @@ void loop() {
       // turn LED off:
       digitalWrite(ledPin, LOW);
       boom = 0;
+        boucle= 0;
     }
 
 
