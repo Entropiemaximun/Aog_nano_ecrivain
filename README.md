@@ -5,4 +5,8 @@ arduino control permi to start  and  stop according  dot matrix
 
  inject in the code  in "message" data  
 
+  example of result 
+https://youtube.com/shorts/YM5mlliT-eU
+
+https://youtu.be/BdGuZAVUV4I
  
